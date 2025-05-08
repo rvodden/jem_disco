@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'dart:developer' as developer;
 
@@ -11,7 +12,26 @@ class BleController {
   final flutterReactiveBle = FlutterReactiveBle();
   StreamSubscription<DiscoveredDevice>? streamSubscription;
 
+  Future<void> _requestBluetoothPermissions() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+    ].request();
+
+    if (!statuses[Permission.bluetoothScan]!.isGranted ) {
+      developer.log('Bluetooth Scan permission not granted');
+      return; // Return early if permissions are not granted
+    }
+
+    if (!statuses[Permission.bluetoothConnect]!.isGranted ) {
+      developer.log('Bluetooth Connect permission not granted');
+      return; // Return early if permissions are not granted
+    }
+  }
+
   void startBluetoothScan(Function(DiscoveredDevice) discoveredDevice) async {
+    _requestBluetoothPermissions();
+
     if (flutterReactiveBle.status == BleStatus.ready) {
       developer.log("Start ble discovery");
       streamSubscription = flutterReactiveBle.scanForDevices(withServices: [
@@ -20,10 +40,17 @@ class BleController {
         if (device.name.isNotEmpty) discoveredDevice(device);
       }, onError: (Object e) => developer.log('Device scan fails with error: $e'));
     } else {
-      developer.log("Device is not ready for communication");
+      developer.log('Device is not ready for communication. Status is: ${flutterReactiveBle.status}');
       Future.delayed(const Duration(seconds: 2), () {
         startBluetoothScan(discoveredDevice);
       });
+    }
+  }
+
+  void stopBluetoothScan() {
+    if (streamSubscription != null) {
+      streamSubscription!.cancel();
+      streamSubscription = null;
     }
   }
 }

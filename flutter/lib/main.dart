@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+
 import 'command.dart';
 import 'ble.dart';
 
@@ -29,14 +29,19 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late BleController bleController;
+
+  @override
+  void initState() {
+    super.initState();
+    bleController = BleController();
+    bleController.startBluetoothScan((discoveredDevice) => {
+      developer.log('Discovered: ${discoveredDevice.name}'),
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    BleController bleController = BleController();
-    bleController.startBluetoothScan((DiscoveredDevice discoveredDevice) =>{
-      developer.log('Discovered Device: ${discoveredDevice.name}')
-    });
-    
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.teal, title: Text(widget.title)),
       body: ColourGrid(),
