@@ -1,63 +1,87 @@
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
-
+import 'package:jem_disco/ble.dart';
+import 'package:jem_disco/device.dart';
+import 'package:provider/provider.dart';
+import 'device_list.dart';
 import 'command.dart';
-import 'ble.dart';
 
 void main() {
   runApp(const JemDisco());
 }
+
 class JemDisco extends StatelessWidget {
   const JemDisco({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Jem\'s Disco',
-      debugShowCheckedModeBanner: false,
-      home: MainScreen(title: 'Jem\'s Disco'),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => JemDiscoModel()),
+          Provider.value(
+            value: BleController()
+          ),
+        ],
+        child: const MainPage(),
+      )
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, required this.title});
-  final String title;
+class MainPage extends StatelessWidget {
+  const MainPage({super.key});
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
+  Future<void> _navigateToDeviceListAndShowPopup(BuildContext context, JemDiscoModel model) async {
+    final device = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Consumer<BleController> (
+          builder: (context, controller, child) => DeviceList(bleController: controller,),
+        )
+      ),
+    );
 
-class _MainScreenState extends State<MainScreen> {
-  late BleController bleController;
+    if (!context.mounted) return;
 
-  @override
-  void initState() {
-    super.initState();
-    bleController = BleController();
-    bleController.startBluetoothScan((discoveredDevice) => {
-      developer.log('Discovered: ${discoveredDevice.name}'),
-    });
+    model.updateDevice(device);
+
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('Connected to ${device.name} @ ${device.id}...')
+      )
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.teal, title: Text(widget.title)),
+      appBar: AppBar(backgroundColor: Colors.teal, title: Text("Jem's Disco")),
       body: ColourGrid(),
+      floatingActionButton: Consumer<JemDiscoModel> (
+        builder: (context, model, child) => FloatingActionButton(
+          onPressed: () { _navigateToDeviceListAndShowPopup(context, model); },
+          tooltip: 'Select Device',
+          child: model.currentDevice == null ? Icon(Icons.link_off) : Icon(Icons.link),
+      )
+      )
     );
   }
-}
+} 
 
 void nullFunction() {}
 
 Widget buildColourButton({required String text, required Color colour}) {
-    return FilledButton(
+    return Consumer<JemDiscoModel> (
+      builder:(context, value, child) => 
+      FilledButton(
         onPressed: SetColourCommand(color: colour).execute,
         style: FilledButton.styleFrom(
           backgroundColor: colour
         ),
         child: Text(text)
+    )
     );
 }
 
