@@ -7,8 +7,8 @@ import 'dart:developer' as developer;
 import 'device.dart';
 
 Uuid bleUart = Uuid.parse("6e400001-b5a3-f393-e0a9-e50e24dcca9e");
-Uuid bleUartRx = Uuid.parse("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
-Uuid bleUartTx = Uuid.parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
+Uuid bleUartTx = Uuid.parse("6e400002-b5a3-f393-e0a9-e50e24dcca9e");
+Uuid bleUartRx = Uuid.parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
 
 class BleController {
   final flutterReactiveBle = FlutterReactiveBle();
@@ -100,6 +100,10 @@ class BleController {
       developer.log('Device is not ready for communication. Status is: ${flutterReactiveBle.status}');
       return;
     }
+  }
+
+  void sendColor(int red, int green, int blue) async {
+    await flutterReactiveBle.writeCharacteristicWithoutResponse(tx, value: [1, red, green, blue, 0]);
   }
   
   // Clean up resources

@@ -1,11 +1,12 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
+import 'package:jem_disco/device.dart';
+import 'package:provider/provider.dart';
 import 'ble.dart';
 
 class DeviceList extends StatefulWidget {
-  final BleController bleController;
-  const DeviceList({super.key, required this.bleController});
+  const DeviceList({super.key});
 
   final String title = "Discovered Devices";
 
@@ -14,17 +15,15 @@ class DeviceList extends StatefulWidget {
 }
 
 class _DeviceListState extends State<DeviceList> {
-  late BleController bleController;
-
   bool isScanning = false;
 
   @override
   void initState() {
     super.initState();
-    bleController = widget.bleController;
   }
 
   void _startBluetoothScan() {
+    BleController bleController = Provider.of<BleController>(context, listen: false);
     setState(() {
       isScanning = true;
     });
@@ -37,6 +36,7 @@ class _DeviceListState extends State<DeviceList> {
   }
 
   void _stopBluetoothScan() {
+    BleController bleController = Provider.of<BleController>(context, listen: false);
     setState(() {
       isScanning = false;
     });
@@ -67,7 +67,7 @@ class _DeviceListState extends State<DeviceList> {
           ),
           Expanded(
             child: StreamBuilder<List<DiscoveredDevice>>(
-              stream: bleController.deviceStream,
+              stream: Provider.of<BleController>(context).deviceStream,
               initialData: const [],
               builder: (context, snapshot) {
                 final devices = snapshot.data ?? [];
@@ -111,7 +111,7 @@ class _DeviceListState extends State<DeviceList> {
                       trailing: ElevatedButton(
                         onPressed: () {
                           _stopBluetoothScan();
-                          Navigator.pop(context, device);
+                          Navigator.pop(context, Device(id: device.id, name: device.name));
                         },
                         child: const Text('Connect'),
                       ),

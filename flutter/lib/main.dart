@@ -16,16 +16,16 @@ class JemDisco extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Jem\'s Disco',
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => JemDiscoModel()),
-          Provider.value(
-            value: BleController()
-          ),
-        ],
-        child: const MainPage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => JemDiscoModel()),
+        Provider<BleController>.value(
+          value: BleController()
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Jem\'s Disco',
+        home: const MainPage(),
       )
     );
   }
@@ -37,14 +37,12 @@ class MainPage extends StatelessWidget {
   Future<void> _navigateToDeviceListAndShowPopup(BuildContext context, JemDiscoModel model) async {
     final device = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Consumer<BleController> (
-          builder: (context, controller, child) => DeviceList(bleController: controller,),
-        )
-      ),
+      MaterialPageRoute(builder: (context) => DeviceList())
     );
 
     if (!context.mounted) return;
 
+    Provider.of<BleController>(context, listen: false).connect(device);
     model.updateDevice(device);
 
     ScaffoldMessenger.of(context)
@@ -76,7 +74,11 @@ Widget buildColourButton({required String text, required Color colour}) {
     return Consumer<JemDiscoModel> (
       builder:(context, value, child) => 
       FilledButton(
-        onPressed: SetColourCommand(color: colour).execute,
+        onPressed: () { 
+          // TODO: wrap in command pattern
+          // SetColourCommand(color: colour).execute()
+          Provider.of<BleController>(context, listen: false).sendColor((colour.r * 255).round(), (colour.g * 255).round(), (colour.b * 255).round());
+        },
         style: FilledButton.styleFrom(
           backgroundColor: colour
         ),
