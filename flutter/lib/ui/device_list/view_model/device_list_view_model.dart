@@ -1,0 +1,33 @@
+import 'package:flutter/foundation.dart';
+import '../../../data/repository/device_repository/device_repository.dart';
+import '../../../model/device.dart';
+
+class DeviceListViewModel extends ChangeNotifier {
+  bool isScanning = false;
+  List<Device> devices = [];
+  String title = 'Discovered Devices';
+
+  final DeviceRepository _deviceRepository;
+
+  DeviceListViewModel({required DeviceRepository deviceRepository}) :
+    _deviceRepository = deviceRepository 
+  {
+    _deviceRepository.scanningStatusStream.listen((bool isScanning) {
+      this.isScanning = isScanning;
+      notifyListeners();
+    });
+
+    _deviceRepository.devicesStream.listen((List<Device> devices) {
+      this.devices = devices;
+      notifyListeners();
+    });
+  }
+
+  void startScan() {
+    _deviceRepository.startScan();
+  }
+
+  void stopScan() {
+    _deviceRepository.stopScan();
+  }
+}
