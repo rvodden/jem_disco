@@ -30,4 +30,8 @@ class DeviceListViewModel extends ChangeNotifier {
   void stopScan() {
     _deviceRepository.stopScan();
   }
+
+  void connect(Device device) {
+    _deviceRepository.connect(device);
+  }
 }

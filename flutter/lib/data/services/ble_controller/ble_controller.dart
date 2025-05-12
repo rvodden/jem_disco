@@ -13,8 +13,11 @@ Uuid bleUartRx = Uuid.parse("6e400003-b5a3-f393-e0a9-e50e24dcca9e");
 
 class BleController {
   StreamSubscription<ConnectionStateUpdate>? connectionStateUpdateStreamSubscription;
-  late QualifiedCharacteristic tx;
-  
+  QualifiedCharacteristic? tx;
+
+  final StreamController<Device?> _connectedDevice = StreamController.broadcast();
+  Stream<Device?> get connectedDeviceStream => _connectedDevice.stream;
+
   final FlutterReactiveBle _flutterReactiveBle;
   final PermissionManager _permissionManager;
   StreamSubscription<DiscoveredDevice>? _discoveredDeviceStreamSubscription;
@@ -71,15 +74,20 @@ class BleController {
                 serviceId: bleUart,
                 deviceId: device.id
               );
+              _connectedDevice.add(device);
               break;
             case DeviceConnectionState.connecting:
               developer.log('Connecting to device: ${device.id}');
               break;
             case DeviceConnectionState.disconnected:
               developer.log('Disconnecting from device: ${device.id}');
+              tx = null;
+              _connectedDevice.add(null);
               break;
             case DeviceConnectionState.disconnecting:
               developer.log('Disconnected from device: ${device.id}');
+              tx = null;
+              _connectedDevice.add(null);
               break;
           }
         });

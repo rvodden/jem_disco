@@ -70,7 +70,8 @@ class DeviceList extends StatelessWidget {
                       trailing: ElevatedButton(
                         onPressed: () {
                           _model.stopScan();
-                          Navigator.pop(context, device);
+                          _model.connect(device);
+                          Navigator.pop(context);
                         },
                         child: const Text('Connect'),
                       ),

@@ -11,8 +11,10 @@ abstract class DeviceRepository {
 
   Stream<List<Device>> get devicesStream;
   Stream<bool> get scanningStatusStream;
+  Stream<Device?> get connectedDeviceStream;
 
-  sendColour(int red, int green, int blue);
+  void connect(Device device);
+  void sendColour(int red, int green, int blue);
 }
 
 class BluetoothDeviceRepository implements DeviceRepository {
@@ -42,8 +44,16 @@ class BluetoothDeviceRepository implements DeviceRepository {
   }
   
   @override
-  sendColour(int red, int green, int blue) {
+  void sendColour(int red, int green, int blue) {
     _bleController.send([1, red, green, blue, 0] as Uint8List);
   }
+  
+  @override
+  void connect(Device device) {
+    _bleController.connect(device);
+  }
+  
+  @override
+  Stream<Device?> get connectedDeviceStream => _bleController.connectedDeviceStream;
   
 }
