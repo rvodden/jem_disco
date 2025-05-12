@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:jem_disco/data/services/ble_controller/ble_controller.dart';
 import 'package:jem_disco/model/device.dart';
-import 'package:jem_disco/main_page.dart';
+import 'package:jem_disco/ui/main_page/widgets/main_page_screen.dart';
 import 'package:jem_disco/data/services/permission_manager/permission_manager_interface.dart';
 import 'package:provider/provider.dart';
 

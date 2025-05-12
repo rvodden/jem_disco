@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:jem_disco/data/services/permission_manager/permission_manager_interface.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
@@ -87,8 +88,8 @@ class BleController {
     }
   }
 
-  void sendColor(int red, int green, int blue) async {
-    await _flutterReactiveBle.writeCharacteristicWithoutResponse(tx, value: [1, red, green, blue, 0]);
+  void send(Uint8List message) async {
+    await _flutterReactiveBle.writeCharacteristicWithoutResponse(tx, value: message);
   }
   
   // Clean up resources
