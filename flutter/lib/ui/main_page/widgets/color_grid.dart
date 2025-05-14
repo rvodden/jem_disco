@@ -2,25 +2,22 @@ import 'package:flutter/material.dart';
 
 void nullFunction() {}
 
-Widget buildColourButton({required String text, required Color colour}) {
-    return Consumer<JemDiscoModel> (
-      builder:(context, value, child) => 
-      FilledButton(
+Widget buildColourButton({required String text, required Color colour, required void Function() sendColor}) {
+
+    return FilledButton(
         onPressed: () { 
-          // TODO: wrap in command pattern
-          // SetColourCommand(color: colour).execute()
-          Provider.of<BleController>(context, listen: false).sendColor((colour.r * 255).round(), (colour.g * 255).round(), (colour.b * 255).round());
+          sendColor();
         },
         style: FilledButton.styleFrom(
           backgroundColor: colour
         ),
         child: Text(text)
-    )
     );
 }
 
-class ColourGrid extends StatelessWidget {
-  const ColourGrid({super.key});
+class ColorGrid extends StatelessWidget {
+  final void Function(Color) _sendColor;
+  const ColorGrid({super.key, required void Function(Color) sendColor}) : _sendColor = sendColor;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +31,17 @@ class ColourGrid extends StatelessWidget {
         buildColourButton(
           text: "Red",
           colour: Colors.red,
+          sendColor: () => _sendColor(Color.fromARGB(255, 255, 0, 0))
         ),
         buildColourButton(
           text: "Green",
           colour: Colors.green,
+          sendColor: () => _sendColor(Color.fromARGB(255, 0, 255, 0))
         ),
         buildColourButton(
           text: "Blue",
           colour: Colors.blue,
+          sendColor: () => _sendColor(Color.fromARGB(255, 0, 0, 255))
         ),
       ],
     );

@@ -2,9 +2,9 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../view_model/device_list_view_model.dart';
 
-class DeviceList extends StatelessWidget {
+class DeviceListScreen extends StatelessWidget {
   final DeviceListViewModel _model;
-  const DeviceList({super.key, required model}) : _model = model;
+  const DeviceListScreen({super.key, required model}) : _model = model;
 
   @override
   Widget build(BuildContext context) {

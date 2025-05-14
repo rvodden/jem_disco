@@ -7,8 +7,6 @@ class DeviceListViewModel extends ChangeNotifier {
   List<Device> devices = [];
   String title = 'Discovered Devices';
 
-  final DeviceRepository _deviceRepository;
-
   DeviceListViewModel({required DeviceRepository deviceRepository}) :
     _deviceRepository = deviceRepository 
   {
@@ -22,6 +20,8 @@ class DeviceListViewModel extends ChangeNotifier {
       notifyListeners();
     });
   }
+  
+  final DeviceRepository _deviceRepository;
 
   void startScan() {
     _deviceRepository.startScan();

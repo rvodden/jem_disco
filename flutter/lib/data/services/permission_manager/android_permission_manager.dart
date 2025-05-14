@@ -1,9 +1,17 @@
 import 'dart:developer' as developer;
 
-import 'package:jem_disco/data/services/permission_manager/permission_manager_interface.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'permission_manager_interface.dart';
+
 class AndroidPermissionManager implements PermissionManager {
+  static final AndroidPermissionManager _instance = AndroidPermissionManager._();
+  AndroidPermissionManager._();
+
+  factory AndroidPermissionManager() {
+    return _instance;
+  }
+
   @override
   Future<bool> requestBluetoothPermissions() async {
     Map<Permission, PermissionStatus> statuses = await [
@@ -20,10 +28,7 @@ class AndroidPermissionManager implements PermissionManager {
       developer.log('Bluetooth Connect permission not granted');
       return false; // Return early if permissions are not granted
     }
-
+    
     return true;
   }
-
 }
-
-PermissionManager getPermissionManager() => AndroidPermissionManager();

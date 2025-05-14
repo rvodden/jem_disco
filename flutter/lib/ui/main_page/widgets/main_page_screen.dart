@@ -1,35 +1,21 @@
-
 import 'package:flutter/material.dart';
-import 'package:jem_disco/model/device.dart';
 import 'package:jem_disco/ui/main_page/view_model/main_page_view_model.dart';
-import 'package:jem_disco/ui/main_page/widgets/colour_grid.dart';
-import 'package:provider/provider.dart';
+import 'package:jem_disco/ui/main_page/widgets/color_grid.dart';
 
-class MainPage extends StatelessWidget {
-  final MainPageViewModel model;
-  const MainPage({super.key, required this.model});
-
-  void _navigateToDeviceListAndShowPopup(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      "/devices"
-    ) as Device;
-  }
+class MainPageScreen extends StatelessWidget {
+  final MainPageViewModel _model;
+  const MainPageScreen({super.key, required MainPageViewModel model}) : _model = model;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.teal, title: Text("Jem's Disco")),
-      body: ColourGrid(),
-      floatingActionButton: Consumer<JemDiscoModel> (
-        builder: (context, model, child) => FloatingActionButton(
-          onPressed: () { _navigateToDeviceListAndShowPopup(context, model); },
-          tooltip: 'Select Device',
-          child: model.currentDevice == null ? Icon(Icons.link_off) : Icon(Icons.link),
-      )
+      body: ColorGrid(sendColor: _model.sendColor),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () => Navigator.pushNamed(context, "/devices"),
+          tooltip: _model.isConnected ? 'Connected to ${_model.connectedDevice!.name}' : 'Select Device',
+          child: _model.isConnected ? Icon(Icons.link_off) : Icon(Icons.link),
       )
     );
   }
-} 
-
-
+}

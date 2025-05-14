@@ -97,7 +97,9 @@ class BleController {
   }
 
   void send(Uint8List message) async {
-    await _flutterReactiveBle.writeCharacteristicWithoutResponse(tx, value: message);
+    // TODO:  handle lack of connection better
+    if (tx == null) return;
+    await _flutterReactiveBle.writeCharacteristicWithoutResponse(tx!, value: message);
   }
   
   // Clean up resources

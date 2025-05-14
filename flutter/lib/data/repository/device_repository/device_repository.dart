@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:jem_disco/data/services/ble_controller/ble_controller.dart';
@@ -14,7 +15,7 @@ abstract class DeviceRepository {
   Stream<Device?> get connectedDeviceStream;
 
   void connect(Device device);
-  void sendColour(int red, int green, int blue);
+  void sendColor(Color color);
 }
 
 class BluetoothDeviceRepository implements DeviceRepository {
@@ -44,8 +45,10 @@ class BluetoothDeviceRepository implements DeviceRepository {
   }
   
   @override
-  void sendColour(int red, int green, int blue) {
-    _bleController.send([1, red, green, blue, 0] as Uint8List);
+  void sendColor(Color color) {
+    int scale(double v, [int scale = 255]) => (v * scale).round();
+    
+    _bleController.send(Uint8List.fromList([1, scale(color.r), scale(color.g), scale(color.b), 0]));
   }
   
   @override
