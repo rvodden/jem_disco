@@ -5,13 +5,35 @@ import 'package:jem_disco/data/services/ble_controller/ble_controller.dart';
 import 'package:jem_disco/data/services/permission_manager/android_permission_manager.dart';
 import 'package:jem_disco/ui/device_list/view_model/device_list_view_model.dart';
 import 'package:jem_disco/ui/main_page/view_model/main_page_view_model.dart';
+import 'package:provider/provider.dart';
 
+import 'data/services/permission_manager/permission_manager_interface.dart';
 import 'routes.dart';
 import 'ui/device_list/widgets/device_list_screen.dart';
 import 'ui/main_page/widgets/main_page_screen.dart';
 
 void main() {
-  runApp(JemDisco());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider.value(value: FlutterReactiveBle()),
+        Provider<PermissionManager>.value(value: AndroidPermissionManager()),
+        Provider<BleController>(create: (context) => BleController(
+          flutterReactiveBle: context.read<FlutterReactiveBle>(),
+          permissionManager: context.read<PermissionManager>())
+        ),
+        Provider<DeviceRepository>(create: (context) => BluetoothDeviceRepository(bleController: context.read<BleController>()),),
+        ChangeNotifierProvider(create:(context) => MainPageViewModel(
+          deviceRepository: context.read<DeviceRepository>())
+        ),
+        ChangeNotifierProvider(create:(context) => DeviceListViewModel(
+          deviceRepository: context.read<DeviceRepository>()),
+        ),
+      ],
+      child: JemDisco()
+    )
+  ); // runApp
 }
 
 class JemDisco extends StatelessWidget {
@@ -19,18 +41,13 @@ class JemDisco extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    BleController bleController = BleController(
-      flutterReactiveBle: FlutterReactiveBle(),
-      // TODO: handle other platforms (iOS, Web, etc.)
-      permissionManager: AndroidPermissionManager()
-    );
-    DeviceRepository deviceRepository = BluetoothDeviceRepository(bleController: bleController);
     return MaterialApp(
       title: 'Jem\'s Disco',
       routes: {
-        Routes.home: (context) => MainPageScreen(model: MainPageViewModel(deviceRepository: deviceRepository)),
-        Routes.devices: (context) => DeviceListScreen(model: DeviceListViewModel(deviceRepository: deviceRepository)),
+        Routes.home: (context) => MainPageScreen(model: context.read<MainPageViewModel>()),
+        Routes.devices: (context) => DeviceListScreen(model: context.read<DeviceListViewModel>()),
       },
+      initialRoute: Routes.home,
     );
   }
 }

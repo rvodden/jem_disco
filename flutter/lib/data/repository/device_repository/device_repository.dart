@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:ui';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
-import 'package:jem_disco/data/services/ble_controller/ble_controller.dart';
 
+import '../../services/ble_controller/ble_controller.dart';
 import '../../../model/device.dart';
 
 abstract class DeviceRepository {
@@ -15,7 +15,7 @@ abstract class DeviceRepository {
   Stream<Device?> get connectedDeviceStream;
 
   void connect(Device device);
-  void sendColor(Color color);
+  void sendCommand(int command);
 }
 
 class BluetoothDeviceRepository implements DeviceRepository {
@@ -30,29 +30,33 @@ class BluetoothDeviceRepository implements DeviceRepository {
   Stream<List<Device>> get devicesStream => _devicesStream.stream;
   
   @override
-  Stream<bool> get scanningStatusStream => _bleController.scanningStatus;
+  Stream<bool> get scanningStatusStream => _bleController.scanningStatusStream;
 
   @override
   void startScan() {
+    developer.log('Start scanning...');
     _bleController.startBluetoothScan((device)  {
-      _deviceList.add(device);
+      if(!_deviceList.contains(device)) {
+        _deviceList.add(device);
+        _devicesStream.add(_deviceList);
+      }
     });
   }
 
   @override
   void stopScan() {
+    developer.log('Stop scanning.');
     _bleController.stopBluetoothScan();
   }
   
   @override
-  void sendColor(Color color) {
-    int scale(double v, [int scale = 255]) => (v * scale).round();
-    
-    _bleController.send(Uint8List.fromList([1, scale(color.r), scale(color.g), scale(color.b), 0]));
+  void sendCommand(int command) {
+    _bleController.send(Uint8List.fromList([1, command, 0]));
   }
   
   @override
   void connect(Device device) {
+    developer.log('Connecting to ${device.name}...');
     _bleController.connect(device);
   }
   

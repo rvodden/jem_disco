@@ -13,12 +13,13 @@ class MainPageViewModel extends ChangeNotifier {
     _deviceRepository.connectedDeviceStream.listen((device) {
       isConnected = (device != null);
       connectedDevice = device;
+      notifyListeners();
     });
   }
 
   final DeviceRepository _deviceRepository;
   
-  void sendColor(Color color) {
-    _deviceRepository.sendColor(color);
+  void sendCommand(int command) {
+    _deviceRepository.sendCommand(command);
   }
 }

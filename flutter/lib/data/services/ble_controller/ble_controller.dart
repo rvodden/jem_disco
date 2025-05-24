@@ -23,7 +23,7 @@ class BleController {
   StreamSubscription<DiscoveredDevice>? _discoveredDeviceStreamSubscription;
 
   final StreamController<bool> _scanningStatus = StreamController.broadcast();
-  Stream<bool> get scanningStatus => _scanningStatus.stream;
+  Stream<bool> get scanningStatusStream => _scanningStatus.stream;
 
   BleController({required FlutterReactiveBle flutterReactiveBle, required PermissionManager permissionManager}) :
   _flutterReactiveBle = flutterReactiveBle,
@@ -42,6 +42,7 @@ class BleController {
       ]).listen((discoveredDevice) async {
         if (discoveredDevice.name.isNotEmpty) {
           // Call the callback
+          developer.log('Discovered device: ${discoveredDevice.name}');
           deviceDiscoveredCallback(DeviceFactory.fromDiscoveredDevice(discoveredDevice));
         }
       }, onError: (Object e) => developer.log('Device scan fails with error: $e'));
@@ -55,6 +56,7 @@ class BleController {
   }
 
   void stopBluetoothScan() {
+    developer.log("Stop Scanning.");
     if (_discoveredDeviceStreamSubscription != null) {
       _scanningStatus.add(false);
       _discoveredDeviceStreamSubscription!.cancel();

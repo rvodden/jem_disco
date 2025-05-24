@@ -16,8 +16,8 @@ Widget buildColourButton({required String text, required Color colour, required 
 }
 
 class ColorGrid extends StatelessWidget {
-  final void Function(Color) _sendColor;
-  const ColorGrid({super.key, required void Function(Color) sendColor}) : _sendColor = sendColor;
+  final void Function(int) _sendCommand;
+  const ColorGrid({super.key, required void Function(int) sendCommand}) : _sendCommand = sendCommand;
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +31,17 @@ class ColorGrid extends StatelessWidget {
         buildColourButton(
           text: "Red",
           colour: Colors.red,
-          sendColor: () => _sendColor(Color.fromARGB(255, 255, 0, 0))
+          sendColor: () => _sendCommand(1)
         ),
         buildColourButton(
           text: "Green",
           colour: Colors.green,
-          sendColor: () => _sendColor(Color.fromARGB(255, 0, 255, 0))
+          sendColor: () => _sendCommand(2)
         ),
         buildColourButton(
           text: "Blue",
           colour: Colors.blue,
-          sendColor: () => _sendColor(Color.fromARGB(255, 0, 0, 255))
+          sendColor: () => _sendCommand(3)
         ),
       ],
     );

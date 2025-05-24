@@ -5,13 +5,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'permission_manager_interface.dart';
 
 class AndroidPermissionManager implements PermissionManager {
-  static final AndroidPermissionManager _instance = AndroidPermissionManager._();
-  AndroidPermissionManager._();
-
-  factory AndroidPermissionManager() {
-    return _instance;
-  }
-
   @override
   Future<bool> requestBluetoothPermissions() async {
     Map<Permission, PermissionStatus> statuses = await [

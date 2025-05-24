@@ -10,7 +10,7 @@ class MainPageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.teal, title: Text("Jem's Disco")),
-      body: ColorGrid(sendColor: _model.sendColor),
+      body: ColorGrid(sendCommand: _model.sendCommand),
       floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.pushNamed(context, "/devices"),
           tooltip: _model.isConnected ? 'Connected to ${_model.connectedDevice!.name}' : 'Select Device',
